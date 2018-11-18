@@ -22,18 +22,21 @@ class ViewController: UIViewController {
         button.center = view.center
         button.setTitle("Hoge", for: .normal)
         button.setTitleColor(.darkText, for: .normal)
+        button.backgroundColor = UIColor.groupTableViewBackground
+        button.layer.cornerRadius = 8
 
-        let contentView = ContainerView()
-        contentView.bounds = CGRect(x: 0, y: 0, width: 160, height: 80)
+        let label = UILabel()
+        label.text = "hoge hoge hoge"
+        label.textColor = .lightText
+        label.textAlignment = .center
         
-        let ballonView = BalloonView()
-        ballonView.frame = CGRect(x: 0, y: 0, width: 160, height: 80)
-        
-        let popupView = PopupView()
+        let popupView = PopupView(backgroundColor: UIColor.darkGray)
+        popupView.bounds = CGRect(x: 0, y: 0, width: 200, height: 200)
         popupView.show(
-            contentView: ballonView,
+            contentView: label,
             fromView: button,
             targetView: view,
+            position: .top,
             animated: true
         )
 

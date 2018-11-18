@@ -10,17 +10,34 @@ import UIKit
 
 // TODO: dynamic interaction
 
+public enum PopupPosition {
+    case top, bottom
+}
+
+public protocol PopupViewContainerType {
+    var position: PopupPosition { get set }
+    var arrowHeight: CGFloat { get }
+    var arrowWidth: CGFloat { get }
+    var cornerRadius: CGFloat { get }
+    func set(contentView: UIView)
+    func set(backgroundColor: UIColor)
+}
 
 public class PopupView: UIView {
-    
+
+    private var containerView: (UIView & PopupViewContainerType) = BalloonView()
     private var contentView: UIView?
     private var fromView: UIView?
     private var targetView: UIView?
     
-//    private let containerView = UIView()
+    private var position: PopupPosition = .top
     
-    public init() {
+    public init(backgroundColor: UIColor) {
+
         super.init(frame: .zero)
+        
+        addSubview(containerView)
+        containerView.set(backgroundColor: backgroundColor)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -30,29 +47,35 @@ public class PopupView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
-        guard let fromView = fromView, let contentView = contentView else { return }
+        guard let fromView = fromView else { return }
 
         // TODO: いい感じに位置を調整
+
+        containerView.frame = bounds
+
+        switch position {
+        case .top:
+            center = CGPoint(x: fromView.center.x, y: fromView.center.y - fromView.bounds.height / 2 - bounds.height / 2)
+        case .bottom:
+            center = CGPoint(x: fromView.center.x, y: fromView.center.y + fromView.bounds.height / 2 + bounds.height / 2)
+        }
         
-        bounds = CGRect(origin: .zero, size: contentView.bounds.size)
-        center = CGPoint(x: fromView.center.x, y: fromView.center.y - fromView.bounds.height / 2 - bounds.height / 2)
-        
-        contentView.frame = bounds
     }
 
-    public func show(contentView: UIView, fromView: UIView, targetView: UIView, animated: Bool) {
+    public func show(contentView: UIView, fromView: UIView, targetView: UIView, position: PopupPosition, animated: Bool) {
 
         isHidden = false
         
         self.contentView = contentView
         self.fromView = fromView
         self.targetView = targetView
+        self.position = position
         
         targetView.addSubview(self)
-        addSubview(contentView)
-//        addSubview(containerView)
 //        containerView.addSubview(contentView)
-
+        containerView.position = position
+        containerView.set(contentView: contentView)
+        
         layoutIfNeeded()
         
         // TODO: show animation
@@ -77,49 +100,41 @@ public class PopupView: UIView {
 }
 
 
-public class ContainerView: UIView {
+public class BalloonView: UIView, PopupViewContainerType {
     
-    private let margin: CGFloat = 8
+    private var balloonBackgroundColor: UIColor?
+    private var contentView: UIView?
     
-    private let label: UILabel = .init()
+    public var cornerRadius: CGFloat {
+        return 8
+    }
     
-    public init() {
-        super.init(frame: .zero)
-        
-        addSubview(label)
+    public var arrowWidth: CGFloat {
+        return 24
+    }
+    
+    public var arrowHeight: CGFloat {
+        return 12
+    }
+    
+    public var position: PopupPosition = .top {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
 
-        label.text = "Hoge is hoge."
-        label.textAlignment = .center
-        
-        backgroundColor = .white
-        
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowRadius = 12
-        layer.shadowOffset = .init(width: 0, height: 6)
-        layer.shadowOpacity = 0.9
-        layer.cornerRadius = 8
-        clipsToBounds = false
+    public func set(backgroundColor: UIColor) {
+        balloonBackgroundColor = backgroundColor
+        setNeedsDisplay()
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public func set(contentView: UIView) {
+        self.contentView = contentView
+        addSubview(contentView)
+        setNeedsDisplay()
     }
-    
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        
-        layer.shadowPath = UIBezierPath(rect: bounds.insetBy(dx: 16, dy: 16)).cgPath
-        label.frame = CGRect(x: margin, y: margin, width: bounds.width - margin * 2, height: bounds.height - margin * 2)
-    }
-    
-    @objc private func didTapDoneButton() {
-        print("tap done button")
-    }
-    
-}
 
-
-public class BalloonView: UIView {
+    // MARK: - initialize
     
     public init() {
         super.init(frame: .zero)
@@ -130,75 +145,140 @@ public class BalloonView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func radian(_ angle: CGFloat) -> CGFloat {
-        return angle * CGFloat(CGFloat.pi) / 180
+    // MARK: - functions
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        switch position {
+        case .top:
+            contentView?.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height - arrowHeight)
+        case .bottom:
+            contentView?.frame = CGRect(x: 0, y: arrowHeight, width: bounds.width, height: bounds.height - arrowHeight)
+        }
     }
 
     override public func draw(_ rect: CGRect) {
         
         let bezierPath = UIBezierPath()
 
-        let topLeft: CGFloat = 8
-        let topRight: CGFloat = 8
-        let bottomRight: CGFloat = 8
-        let bottomLeft: CGFloat = 8
-        
-        let arrowHeight: CGFloat = 10
-        let arrowWidth: CGFloat = 20
-
+        let contentWidth: CGFloat = rect.maxX
+        let contentHeight: CGFloat = rect.maxY - arrowHeight
         let arrowPositionX: CGFloat = rect.maxX / 2
-            
-        //Draw main body
         
-        bezierPath.move(to: CGPoint(x: topLeft, y: 0))
+        let offsetY: CGFloat
+        switch position {
+        case .top:
+            offsetY = 0
+        case .bottom:
+            offsetY = arrowHeight
+        }
         
-        bezierPath.addLine(to: CGPoint(x: rect.maxX - topRight, y: 0))
+        // main body
+        
+        bezierPath.move(
+            to: .init(
+                x: cornerRadius,
+                y: offsetY
+            )
+        )
+        
+        bezierPath.addLine(
+            to: .init(
+                x: contentWidth - cornerRadius,
+                y: offsetY
+            )
+        )
+        
+        // top right
         bezierPath.addArc(
-            withCenter: CGPoint(x: rect.maxX - topRight, y: topRight),
-            radius: topRight,
+            withCenter: .init(
+                x: contentWidth - cornerRadius,
+                y: cornerRadius + offsetY
+            ),
+            radius: cornerRadius,
             startAngle: radian(-90),
             endAngle: radian(0),
             clockwise: true
         )
         
-        bezierPath.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - bottomRight - arrowHeight))
+        bezierPath.addLine(
+            to: .init(
+                x: contentWidth,
+                y: contentHeight - cornerRadius + offsetY
+            )
+        )
+        
+        // bottom right
         bezierPath.addArc(
-            withCenter: CGPoint(x: rect.maxX - bottomRight, y: rect.maxY - bottomRight - arrowHeight),
-            radius: bottomRight,
+            withCenter: .init(
+                x: contentWidth - cornerRadius,
+                y: contentHeight - cornerRadius + offsetY
+            ),
+            radius: cornerRadius,
             startAngle: radian(0),
             endAngle: radian(90),
             clockwise: true
         )
         
-        bezierPath.addLine(to: CGPoint(x: bottomLeft, y: rect.maxY - arrowHeight))
+        bezierPath.addLine(
+            to: .init(
+                x: cornerRadius,
+                y: contentHeight + offsetY
+            )
+        )
+        
+        // bottom left
         bezierPath.addArc(
-            withCenter: CGPoint(x: bottomLeft, y: rect.maxY - bottomLeft - arrowHeight),
-            radius: bottomLeft,
+            withCenter: .init(
+                x: cornerRadius,
+                y: contentHeight - cornerRadius + offsetY
+            ),
+            radius: cornerRadius,
             startAngle: radian(90),
             endAngle: radian(180),
             clockwise: true
         )
         
-        bezierPath.addLine(to: CGPoint(x: 0, y: topLeft))
+        bezierPath.addLine(
+            to: .init(
+                x: 0,
+                y: cornerRadius + offsetY
+            )
+        )
+        
+        // top left
         bezierPath.addArc(
-            withCenter: CGPoint(x: topLeft, y: topLeft),
-            radius: topLeft,
+            withCenter: .init(
+                x: cornerRadius,
+                y: cornerRadius + offsetY
+            ),
+            radius: cornerRadius,
             startAngle: radian(180),
             endAngle: radian(270),
             clockwise: true
         )
         
         
-        //Draw the tail
-        bezierPath.move(to: CGPoint(x: arrowPositionX - arrowWidth / 2, y: rect.maxY - arrowHeight))
-        bezierPath.addLine(to: CGPoint(x: arrowPositionX, y: rect.maxY))
-        bezierPath.addLine(to: CGPoint(x: arrowPositionX + arrowWidth / 2, y: rect.maxY - arrowHeight))
-        
+        // arrow
+        switch position {
+        case .top:
+            bezierPath.move(to: .init(x: arrowPositionX - arrowWidth / 2, y: contentHeight))
+            bezierPath.addLine(to: .init(x: arrowPositionX, y: rect.maxY))
+            bezierPath.addLine(to: .init(x: arrowPositionX + arrowWidth / 2, y: contentHeight))
+        case .bottom:
+            bezierPath.move(to: .init(x: arrowPositionX - arrowWidth / 2, y: offsetY))
+            bezierPath.addLine(to: .init(x: arrowPositionX, y: 0))
+            bezierPath.addLine(to: .init(x: arrowPositionX + arrowWidth / 2, y: offsetY))
+        }
+    
         // Draw
-        UIColor.lightGray.setFill()
+        balloonBackgroundColor?.setFill()
         bezierPath.fill()
         bezierPath.close()
-        
+    }
+    
+    private func radian(_ angle: CGFloat) -> CGFloat {
+        return angle * CGFloat(CGFloat.pi) / 180
     }
 
 }

@@ -30,13 +30,19 @@ class ViewController: UIViewController {
         label.textColor = .lightText
         label.textAlignment = .center
         
-        let popupView = PopupView(backgroundColor: UIColor.darkGray)
+        let popupView = PopupView()
         popupView.bounds = CGRect(x: 0, y: 0, width: 200, height: 200)
         popupView.show(
             contentView: label,
             fromView: button,
             targetView: view,
-            position: .top,
+            appearance: .init(
+                backgroundColor: .darkGray,
+                position: .top,
+                arrowHeight: 12,
+                arrowWidth: 24,
+                cornerRadius: 8
+            ),
             animated: true
         )
 

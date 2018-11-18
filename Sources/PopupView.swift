@@ -14,30 +14,52 @@ public enum PopupPosition {
     case top, bottom
 }
 
+public struct PopupViewAppearance {
+    
+    let backgroundColor: UIColor
+    let position: PopupPosition
+    let arrowHeight: CGFloat
+    let arrowWidth: CGFloat
+    let cornerRadius: CGFloat
+    
+    public init(
+        backgroundColor: UIColor,
+        position: PopupPosition,
+        arrowHeight: CGFloat,
+        arrowWidth: CGFloat,
+        cornerRadius: CGFloat
+        ) {
+        
+        self.backgroundColor = backgroundColor
+        self.position = position
+        self.arrowHeight = arrowHeight
+        self.arrowWidth = arrowWidth
+        self.cornerRadius = cornerRadius
+    }
+}
+
 public protocol PopupViewContainerType {
-    var position: PopupPosition { get set }
-    var arrowHeight: CGFloat { get }
-    var arrowWidth: CGFloat { get }
-    var cornerRadius: CGFloat { get }
+    
+    func set(appearance: PopupViewAppearance)
     func set(contentView: UIView)
-    func set(backgroundColor: UIColor)
 }
 
 public class PopupView: UIView {
 
-    private var containerView: (UIView & PopupViewContainerType) = BalloonView()
+    private var containerView: (UIView & PopupViewContainerType)
     private var contentView: UIView?
     private var fromView: UIView?
     private var targetView: UIView?
     
-    private var position: PopupPosition = .top
+    private var position: PopupPosition?
     
-    public init(backgroundColor: UIColor) {
+    public init(containerView: (UIView & PopupViewContainerType) = BalloonView()) {
 
+        self.containerView = containerView
+        
         super.init(frame: .zero)
         
         addSubview(containerView)
-        containerView.set(backgroundColor: backgroundColor)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -47,9 +69,7 @@ public class PopupView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
-        guard let fromView = fromView else { return }
-
-        // TODO: いい感じに位置を調整
+        guard let fromView = fromView, let position = position else { return }
 
         containerView.frame = bounds
 
@@ -62,19 +82,19 @@ public class PopupView: UIView {
         
     }
 
-    public func show(contentView: UIView, fromView: UIView, targetView: UIView, position: PopupPosition, animated: Bool) {
+    public func show(contentView: UIView, fromView: UIView, targetView: UIView, appearance: PopupViewAppearance, animated: Bool) {
 
         isHidden = false
         
         self.contentView = contentView
         self.fromView = fromView
         self.targetView = targetView
-        self.position = position
+        
+        self.position = appearance.position
         
         targetView.addSubview(self)
-//        containerView.addSubview(contentView)
-        containerView.position = position
         containerView.set(contentView: contentView)
+        containerView.set(appearance: appearance)
         
         layoutIfNeeded()
         
@@ -102,41 +122,13 @@ public class PopupView: UIView {
 
 public class BalloonView: UIView, PopupViewContainerType {
     
-    private var balloonBackgroundColor: UIColor?
     private var contentView: UIView?
+    private var appearance: PopupViewAppearance?
     
-    public var cornerRadius: CGFloat {
-        return 8
-    }
-    
-    public var arrowWidth: CGFloat {
-        return 24
-    }
-    
-    public var arrowHeight: CGFloat {
-        return 12
-    }
-    
-    public var position: PopupPosition = .top {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
-
-    public func set(backgroundColor: UIColor) {
-        balloonBackgroundColor = backgroundColor
-        setNeedsDisplay()
-    }
-    
-    public func set(contentView: UIView) {
-        self.contentView = contentView
-        addSubview(contentView)
-        setNeedsDisplay()
-    }
-
     // MARK: - initialize
     
     public init() {
+        
         super.init(frame: .zero)
         backgroundColor = .clear
     }
@@ -147,44 +139,62 @@ public class BalloonView: UIView, PopupViewContainerType {
 
     // MARK: - functions
     
+    public func set(appearance: PopupViewAppearance) {
+        self.appearance = appearance
+        setNeedsDisplay()
+    }
+    
+    public func set(contentView: UIView) {
+        self.contentView = contentView
+        addSubview(contentView)
+        setNeedsDisplay()
+    }
+    
+
     public override func layoutSubviews() {
+        
         super.layoutSubviews()
-        switch position {
+        
+        guard let appearance = appearance, let contentView = contentView else { return }
+        
+        switch appearance.position {
         case .top:
-            contentView?.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height - arrowHeight)
+            contentView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height - appearance.arrowHeight)
         case .bottom:
-            contentView?.frame = CGRect(x: 0, y: arrowHeight, width: bounds.width, height: bounds.height - arrowHeight)
+            contentView.frame = CGRect(x: 0, y: appearance.arrowHeight, width: bounds.width, height: bounds.height - appearance.arrowHeight)
         }
     }
 
     override public func draw(_ rect: CGRect) {
-        
+
+        guard let appearance = appearance else { return }
+
         let bezierPath = UIBezierPath()
 
         let contentWidth: CGFloat = rect.maxX
-        let contentHeight: CGFloat = rect.maxY - arrowHeight
+        let contentHeight: CGFloat = rect.maxY - appearance.arrowHeight
         let arrowPositionX: CGFloat = rect.maxX / 2
         
         let offsetY: CGFloat
-        switch position {
+        switch appearance.position {
         case .top:
             offsetY = 0
         case .bottom:
-            offsetY = arrowHeight
+            offsetY = appearance.arrowHeight
         }
         
         // main body
         
         bezierPath.move(
             to: .init(
-                x: cornerRadius,
+                x: appearance.cornerRadius,
                 y: offsetY
             )
         )
         
         bezierPath.addLine(
             to: .init(
-                x: contentWidth - cornerRadius,
+                x: contentWidth - appearance.cornerRadius,
                 y: offsetY
             )
         )
@@ -192,10 +202,10 @@ public class BalloonView: UIView, PopupViewContainerType {
         // top right
         bezierPath.addArc(
             withCenter: .init(
-                x: contentWidth - cornerRadius,
-                y: cornerRadius + offsetY
+                x: contentWidth - appearance.cornerRadius,
+                y: appearance.cornerRadius + offsetY
             ),
-            radius: cornerRadius,
+            radius: appearance.cornerRadius,
             startAngle: radian(-90),
             endAngle: radian(0),
             clockwise: true
@@ -204,17 +214,17 @@ public class BalloonView: UIView, PopupViewContainerType {
         bezierPath.addLine(
             to: .init(
                 x: contentWidth,
-                y: contentHeight - cornerRadius + offsetY
+                y: contentHeight - appearance.cornerRadius + offsetY
             )
         )
         
         // bottom right
         bezierPath.addArc(
             withCenter: .init(
-                x: contentWidth - cornerRadius,
-                y: contentHeight - cornerRadius + offsetY
+                x: contentWidth - appearance.cornerRadius,
+                y: contentHeight - appearance.cornerRadius + offsetY
             ),
-            radius: cornerRadius,
+            radius: appearance.cornerRadius,
             startAngle: radian(0),
             endAngle: radian(90),
             clockwise: true
@@ -222,7 +232,7 @@ public class BalloonView: UIView, PopupViewContainerType {
         
         bezierPath.addLine(
             to: .init(
-                x: cornerRadius,
+                x: appearance.cornerRadius,
                 y: contentHeight + offsetY
             )
         )
@@ -230,10 +240,10 @@ public class BalloonView: UIView, PopupViewContainerType {
         // bottom left
         bezierPath.addArc(
             withCenter: .init(
-                x: cornerRadius,
-                y: contentHeight - cornerRadius + offsetY
+                x: appearance.cornerRadius,
+                y: contentHeight - appearance.cornerRadius + offsetY
             ),
-            radius: cornerRadius,
+            radius: appearance.cornerRadius,
             startAngle: radian(90),
             endAngle: radian(180),
             clockwise: true
@@ -242,17 +252,17 @@ public class BalloonView: UIView, PopupViewContainerType {
         bezierPath.addLine(
             to: .init(
                 x: 0,
-                y: cornerRadius + offsetY
+                y: appearance.cornerRadius + offsetY
             )
         )
         
         // top left
         bezierPath.addArc(
             withCenter: .init(
-                x: cornerRadius,
-                y: cornerRadius + offsetY
+                x: appearance.cornerRadius,
+                y: appearance.cornerRadius + offsetY
             ),
-            radius: cornerRadius,
+            radius: appearance.cornerRadius,
             startAngle: radian(180),
             endAngle: radian(270),
             clockwise: true
@@ -260,19 +270,19 @@ public class BalloonView: UIView, PopupViewContainerType {
         
         
         // arrow
-        switch position {
+        switch appearance.position {
         case .top:
-            bezierPath.move(to: .init(x: arrowPositionX - arrowWidth / 2, y: contentHeight))
+            bezierPath.move(to: .init(x: arrowPositionX - appearance.arrowWidth / 2, y: contentHeight))
             bezierPath.addLine(to: .init(x: arrowPositionX, y: rect.maxY))
-            bezierPath.addLine(to: .init(x: arrowPositionX + arrowWidth / 2, y: contentHeight))
+            bezierPath.addLine(to: .init(x: arrowPositionX + appearance.arrowWidth / 2, y: contentHeight))
         case .bottom:
-            bezierPath.move(to: .init(x: arrowPositionX - arrowWidth / 2, y: offsetY))
+            bezierPath.move(to: .init(x: arrowPositionX - appearance.arrowWidth / 2, y: offsetY))
             bezierPath.addLine(to: .init(x: arrowPositionX, y: 0))
-            bezierPath.addLine(to: .init(x: arrowPositionX + arrowWidth / 2, y: offsetY))
+            bezierPath.addLine(to: .init(x: arrowPositionX + appearance.arrowWidth / 2, y: offsetY))
         }
     
         // Draw
-        balloonBackgroundColor?.setFill()
+        appearance.backgroundColor.setFill()
         bezierPath.fill()
         bezierPath.close()
     }

@@ -14,7 +14,33 @@
 		D4F61C0321A1590B00E83EED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4F61C0221A1590B00E83EED /* Assets.xcassets */; };
 		D4F61C0621A1590B00E83EED /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4F61C0421A1590B00E83EED /* LaunchScreen.storyboard */; };
 		D4F61C0C21A15A0200E83EED /* PopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F61C0B21A15A0200E83EED /* PopupView.swift */; };
+		D4F61C0D21A162F800E83EED /* PopupView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4F61BEA21A158C500E83EED /* PopupView.framework */; };
+		D4F61C0E21A162F800E83EED /* PopupView.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D4F61BEA21A158C500E83EED /* PopupView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D4F61C0F21A162F800E83EED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D4F61BE121A158C500E83EED /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D4F61BE921A158C500E83EED;
+			remoteInfo = PopupView;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D4F61C1121A162F800E83EED /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D4F61C0E21A162F800E83EED /* PopupView.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D4F61BEA21A158C500E83EED /* PopupView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PopupView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -42,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4F61C0D21A162F800E83EED /* PopupView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,10 +155,12 @@
 				D4F61BF521A1590B00E83EED /* Sources */,
 				D4F61BF621A1590B00E83EED /* Frameworks */,
 				D4F61BF721A1590B00E83EED /* Resources */,
+				D4F61C1121A162F800E83EED /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				D4F61C1021A162F800E83EED /* PBXTargetDependency */,
 			);
 			name = Demo;
 			productName = Demo;
@@ -215,6 +244,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D4F61C1021A162F800E83EED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D4F61BE921A158C500E83EED /* PopupView */;
+			targetProxy = D4F61C0F21A162F800E83EED /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D4F61BFF21A1590B00E83EED /* Main.storyboard */ = {
@@ -412,6 +449,7 @@
 		D4F61C0921A1590B00E83EED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Demo/Info.plist;
@@ -429,6 +467,7 @@
 		D4F61C0A21A1590B00E83EED /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Demo/Info.plist;

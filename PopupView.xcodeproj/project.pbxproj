@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D408778221A236D20096EFFE /* PopupViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D408778121A236D20096EFFE /* PopupViewContainer.swift */; };
+		D408778421A237F10096EFFE /* PopupViewAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = D408778321A237F10096EFFE /* PopupViewAppearance.swift */; };
 		D4F61BEF21A158C500E83EED /* PopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = D4F61BED21A158C500E83EED /* PopupView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4F61BFC21A1590B00E83EED /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F61BFB21A1590B00E83EED /* AppDelegate.swift */; };
 		D4F61BFE21A1590B00E83EED /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F61BFD21A1590B00E83EED /* ViewController.swift */; };
@@ -43,6 +45,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D408778121A236D20096EFFE /* PopupViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupViewContainer.swift; sourceTree = "<group>"; };
+		D408778321A237F10096EFFE /* PopupViewAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupViewAppearance.swift; sourceTree = "<group>"; };
 		D4F61BEA21A158C500E83EED /* PopupView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PopupView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4F61BED21A158C500E83EED /* PopupView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PopupView.h; sourceTree = "<group>"; };
 		D4F61BEE21A158C500E83EED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -98,6 +102,8 @@
 			children = (
 				D4F61BED21A158C500E83EED /* PopupView.h */,
 				D4F61C0B21A15A0200E83EED /* PopupView.swift */,
+				D408778321A237F10096EFFE /* PopupViewAppearance.swift */,
+				D408778121A236D20096EFFE /* PopupViewContainer.swift */,
 				D4F61BEE21A158C500E83EED /* Info.plist */,
 			);
 			path = Sources;
@@ -230,6 +236,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D408778221A236D20096EFFE /* PopupViewContainer.swift in Sources */,
+				D408778421A237F10096EFFE /* PopupViewAppearance.swift in Sources */,
 				D4F61C0C21A15A0200E83EED /* PopupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

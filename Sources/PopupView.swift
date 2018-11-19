@@ -9,9 +9,18 @@
 import UIKit
 
 // TODO: dynamic interaction
+// TODO: resize target view
+
+// https://github.com/corin8823/Popover
+// https://github.com/mercari/BalloonView
+// https://github.com/pjocprac/PTBalloonView
 
 public class PopupView: UIView {
 
+    enum Animation {
+        
+    }
+    
     public typealias ContainerType = (UIView & PopupViewContainerType)
     
     private var containerView: ContainerType
@@ -77,7 +86,7 @@ public class PopupView: UIView {
     }
     
     public func startAnimation() {
-        // TODO:
+        // TODO: floating animatino
     }
     
     public func stopAnimation() {

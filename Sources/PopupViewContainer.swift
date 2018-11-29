@@ -8,12 +8,6 @@
 
 import UIKit
 
-public protocol PopupViewContainerType {
-    
-    func set(appearance: PopupViewAppearance)
-    func set(contentView: UIView)
-}
-
 public class PopupViewContainer: UIView, PopupViewContainerType {
     
     private var contentView: UIView?
@@ -37,14 +31,19 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
     }
     
     // MARK: - functions
-    
+
     public func set(appearance: PopupViewAppearance) {
+
         self.appearance = appearance
+
         setNeedsDisplay()
     }
-    
-    public func set(contentView: UIView) {
+
+    public func set(contentView: UIView, appearance: PopupViewAppearance) {
+
         self.contentView = contentView
+        self.appearance = appearance
+        
         addSubview(contentView)
         setNeedsDisplay()
     }

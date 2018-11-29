@@ -32,6 +32,7 @@ class ViewController: UIViewController {
         
         let popupView = PopupView()
         popupView.bounds = CGRect(x: 0, y: 0, width: 200, height: 200)
+
         popupView.show(
             contentView: label,
             fromView: button,
@@ -45,6 +46,21 @@ class ViewController: UIViewController {
             ),
             animated: true
         )
+
+//        popupView.show(
+//            contentView: label,
+//            focusPoint: CGPoint(x: 100, y: 200),
+//            targetView: (navigationController?.view)!,
+//            appearance: .init(
+//                backgroundColor: .darkGray,
+//                position: .top,
+//                arrowHeight: 12,
+//                arrowWidth: 24,
+//                cornerRadius: 8
+//            ),
+//            animated: true
+//        )
+
 
     }
 

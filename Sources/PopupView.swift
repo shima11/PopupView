@@ -10,6 +10,7 @@ import UIKit
 
 // TODO: dynamic interaction
 // TODO: resize target view
+// TODO: arrow position (not center)
 
 // https://github.com/corin8823/Popover
 // https://github.com/mercari/BalloonView
@@ -27,8 +28,9 @@ public class PopupView: UIView {
     private var contentView: UIView?
     private var fromView: UIView?
     private var targetView: UIView?
-    
-    private var position: PopupPosition?
+    private var focusPoint: CGPoint?
+
+    private var popupPosition: PopupPosition?
     
     public init(containerView: ContainerType = PopupViewContainer()) {
 
@@ -46,17 +48,48 @@ public class PopupView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
-        guard let fromView = fromView, let position = position else { return }
+        guard let popupPosition = popupPosition else { return }
 
         containerView.frame = bounds
 
-        switch position {
-        case .top:
-            center = CGPoint(x: fromView.center.x, y: fromView.center.y - fromView.bounds.height / 2 - bounds.height / 2)
-        case .bottom:
-            center = CGPoint(x: fromView.center.x, y: fromView.center.y + fromView.bounds.height / 2 + bounds.height / 2)
+        if let fromView = fromView {
+            switch popupPosition {
+            case .top:
+                center = CGPoint(x: fromView.center.x, y: fromView.center.y - fromView.bounds.height / 2 - bounds.height / 2)
+            case .bottom:
+                center = CGPoint(x: fromView.center.x, y: fromView.center.y + fromView.bounds.height / 2 + bounds.height / 2)
+            }
         }
-        
+        else if let focusPoint = focusPoint {
+            switch popupPosition {
+            case .top:
+                center = CGPoint(x: focusPoint.x, y: focusPoint.y - bounds.height / 2)
+            case .bottom:
+                center = CGPoint(x: focusPoint.x, y: focusPoint.y + bounds.height / 2)
+            }
+        }
+
+    }
+
+    public func show(contentView: UIView, focusPoint: CGPoint, targetView: UIView, appearance: PopupViewAppearance, animated: Bool) {
+
+        isHidden = false
+
+        self.contentView = contentView
+        self.targetView = targetView
+        self.focusPoint = focusPoint
+        self.popupPosition = appearance.position
+
+        targetView.addSubview(self)
+        containerView.set(
+            contentView: contentView,
+            appearance: appearance
+        )
+
+        layoutIfNeeded()
+
+        // TODO: show animation
+
     }
 
     public func show(contentView: UIView, fromView: UIView, targetView: UIView, appearance: PopupViewAppearance, animated: Bool) {
@@ -66,12 +99,14 @@ public class PopupView: UIView {
         self.contentView = contentView
         self.fromView = fromView
         self.targetView = targetView
-        
-        self.position = appearance.position
+        self.popupPosition = appearance.position
         
         targetView.addSubview(self)
-        containerView.set(contentView: contentView)
-        containerView.set(appearance: appearance)
+        containerView.set(
+            contentView: contentView,
+            appearance: appearance
+        )
+        
         layoutIfNeeded()
         
         // TODO: show animation

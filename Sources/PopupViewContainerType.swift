@@ -7,3 +7,9 @@
 //
 
 import Foundation
+
+public protocol PopupViewContainerType {
+
+    func set(appearance: PopupViewAppearance)
+    func set(contentView: UIView, appearance: PopupViewAppearance)
+}

@@ -18,6 +18,8 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
     
     private var contentView: UIView?
     private var appearance: PopupViewAppearance?
+
+    private let shapeLayer = CALayer()
     private let maskLayer = CAShapeLayer()
 
     // MARK: - initialize
@@ -25,8 +27,9 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
     public init() {
         
         super.init(frame: .zero)
+
         backgroundColor = .clear
-        layer.addSublayer(maskLayer)
+        layer.addSublayer(shapeLayer)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -60,29 +63,16 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
             contentView.frame = CGRect(x: 0, y: appearance.arrowHeight, width: bounds.width, height: bounds.height - appearance.arrowHeight)
         }
 
-        let bezierPath = makeBezierPath(rect: bounds, appearance: appearance)
-        maskLayer.path = bezierPath.cgPath
-        maskLayer.fillColor = appearance.backgroundColor.cgColor
+        let babblePath = makeBabblePath(rect: bounds, appearance: appearance)
+        maskLayer.path = babblePath.cgPath
 
-//        layer.mask = maskLayer
+        shapeLayer.frame = bounds
+        shapeLayer.backgroundColor = appearance.backgroundColor.cgColor
+        shapeLayer.mask = maskLayer
 
     }
-    
-//    override public func draw(_ rect: CGRect) {
-//
-//        guard let appearance = appearance else { return }
-//
-//        let bezierPath = makeBezierPath(rect: rect, appearance: appearance)
-//
-//       // draw
-//
-//        appearance.backgroundColor.setFill()
-//        bezierPath.fill()
-//        bezierPath.close()
-//    }
 
-
-    private func makeBezierPath(rect: CGRect, appearance: PopupViewAppearance) -> UIBezierPath {
+    private func makeBabblePath(rect: CGRect, appearance: PopupViewAppearance) -> UIBezierPath {
 
         let bezierPath = UIBezierPath()
 
@@ -91,6 +81,7 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
         let arrowPositionX: CGFloat = rect.maxX / 2
 
         let offsetY: CGFloat
+        
         switch appearance.position {
         case .top:
             offsetY = 0
@@ -98,7 +89,7 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
             offsetY = appearance.arrowHeight
         }
 
-        // main body
+        // # main body
 
         bezierPath.move(
             to: .init(
@@ -114,7 +105,8 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
             )
         )
 
-        // top right
+        // ## top right
+
         bezierPath.addArc(
             withCenter: .init(
                 x: contentWidth - appearance.cornerRadius,
@@ -133,7 +125,8 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
             )
         )
 
-        // bottom right
+        // ## bottom right
+
         bezierPath.addArc(
             withCenter: .init(
                 x: contentWidth - appearance.cornerRadius,
@@ -152,7 +145,8 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
             )
         )
 
-        // bottom left
+        // ## bottom left
+
         bezierPath.addArc(
             withCenter: .init(
                 x: appearance.cornerRadius,
@@ -171,7 +165,8 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
             )
         )
 
-        // top left
+        // ## top left
+
         bezierPath.addArc(
             withCenter: .init(
                 x: appearance.cornerRadius,
@@ -184,7 +179,8 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
         )
 
 
-        // arrow
+        // # arrow
+
         switch appearance.position {
         case .top:
             bezierPath.move(to: .init(x: arrowPositionX - appearance.arrowWidth / 2, y: contentHeight))

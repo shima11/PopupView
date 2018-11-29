@@ -106,11 +106,13 @@ public class PopupView: UIView {
             contentView: contentView,
             appearance: appearance
         )
-        
+
         layoutIfNeeded()
-        
+
         // TODO: show animation
-        
+
+        containerView.show()
+
     }
     
     public func dismiss(animated: Bool) {

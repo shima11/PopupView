@@ -73,19 +73,21 @@ public class PopupViewContainer: UIView, PopupViewContainerType {
 
     public func show() {
 
-        guard let appearance = appearance else { return }
+        // TODO: animation
 
-        let rect = CGRect(x: center.x + 5, y: center.y + 5, width: 10, height: 10)
-        let path1 = makeBabblePath(rect: rect, appearance: appearance).cgPath
-        guard let path2 = maskLayer.path else { return }
-
-        let pathKeyframe = CAKeyframeAnimation(keyPath: "path")
-        pathKeyframe.values = [path1, path2]
-        pathKeyframe.keyTimes = [0, 0.8]
-        pathKeyframe.duration = 1.0
-        pathKeyframe.repeatDuration = .infinity
-        pathKeyframe.isRemovedOnCompletion = false
-        maskLayer.add(pathKeyframe, forKey: "path")
+//        guard let appearance = appearance else { return }
+//
+//        let rect = CGRect(x: center.x + 5, y: center.y + 5, width: 10, height: 10)
+//        let path1 = makeBabblePath(rect: rect, appearance: appearance).cgPath
+//        guard let path2 = maskLayer.path else { return }
+//
+//        let pathKeyframe = CAKeyframeAnimation(keyPath: "path")
+//        pathKeyframe.values = [path1, path2]
+//        pathKeyframe.keyTimes = [0, 0.8]
+//        pathKeyframe.duration = 1.0
+//        pathKeyframe.repeatDuration = .infinity
+//        pathKeyframe.isRemovedOnCompletion = false
+//        maskLayer.add(pathKeyframe, forKey: "path")
     }
 
     private func makeBabblePath(rect: CGRect, appearance: PopupViewAppearance) -> UIBezierPath {
